@@ -13,6 +13,15 @@ public class RequestDetails {
     private String time;
     private String state;
     private String serverId;
+    private String phoneNumber;
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     public String getSenderId() {
         return senderId;

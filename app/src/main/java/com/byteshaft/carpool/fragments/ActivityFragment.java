@@ -1,12 +1,14 @@
 package com.byteshaft.carpool.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Base64;
 import android.util.Log;
@@ -146,7 +148,23 @@ public class ActivityFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     if (AppGlobals.getStringFromSP(AppGlobals.KEY_USER_TYPE).equals(AppGlobals.DRIVER)) {
-                        updateState(requestDetails);
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogTheme);
+                        alertDialogBuilder.setTitle("Complete Event");
+                        alertDialogBuilder.setMessage("Do you want to mark event as complete?").setCancelable(false).setPositiveButton("Accept",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.dismiss();
+                                        completeEvent(requestDetails);
+                                    }
+                                });
+                        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
                     } else {
                         Log.i("TAG", "click");
 
@@ -172,7 +190,7 @@ public class ActivityFragment extends Fragment {
 
     }
 
-    private void updateState(final RequestDetails requestInfo) {
+    private void completeEvent(final RequestDetails requestInfo) {
         AppGlobals.showProgressDialog(getActivity(), "updating request...");
         ref = FirebaseDatabase.getInstance().
                 getReferenceFromUrl("https://carpool-ec8c1.firebaseio.com/");

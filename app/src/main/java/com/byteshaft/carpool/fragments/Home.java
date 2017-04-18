@@ -2,6 +2,7 @@ package com.byteshaft.carpool.fragments;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Base64;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -146,6 +149,8 @@ public class Home extends Fragment {
 
             final TextView time = (TextView) findViewById(R.id.time);
 
+            final EditText phoneNumber = (EditText) findViewById(R.id.phone_number);
+
             AppCompatButton dialogButton = (AppCompatButton) findViewById(R.id.cancel);
             dialogButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -167,13 +172,14 @@ public class Home extends Fragment {
                     String from = fromLocation.getText().toString();
                     String to = toLocation.getText().toString();
                     String currentTime = time.getText().toString();
+                    String number = phoneNumber.getText().toString();
                     if (user.trim().isEmpty() || from.trim().isEmpty() || to.trim().isEmpty() ||
-                            currentTime.trim().isEmpty()) {
+                            currentTime.trim().isEmpty() || number.trim().isEmpty()) {
                         Helpers.showSnackBar(getView(), "All fields are required");
                         return;
                     }
                     randomInt = randInt();
-                    sendRequest(from, to, currentTime);
+                    sendRequest(from, to, currentTime, number);
                     dismiss();
 
 
@@ -182,12 +188,13 @@ public class Home extends Fragment {
         }
     }
 
-    private void sendRequest(String fromLocation, String toLocation, String time) {
+    private void sendRequest(String fromLocation, String toLocation, String time, String number) {
         AppGlobals.showProgressDialog(getActivity(), "sending request...");
         ref = FirebaseDatabase.getInstance().
                 getReferenceFromUrl("https://carpool-ec8c1.firebaseio.com/");
         final RequestDetails requestDetails = new RequestDetails();
         requestDetails.setServerId(String.valueOf(randomInt));
+        requestDetails.setPhoneNumber(number);
         requestDetails.setUserName(AppGlobals.getStringFromSP(AppGlobals.KEY_USERNAME));
         requestDetails.setFromLocation(fromLocation);
         requestDetails.setToLocation(toLocation);
@@ -258,6 +265,7 @@ public class Home extends Fragment {
                 viewHolder.toLocation = (TextView) convertView.findViewById(R.id.to_location);
                 viewHolder.time = (TextView) convertView.findViewById(R.id.time);
                 viewHolder.button = (AppCompatButton) convertView.findViewById(R.id.process);
+                viewHolder.phoneNumber = (TextView) convertView.findViewById(R.id.phone_number);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -275,6 +283,11 @@ public class Home extends Fragment {
             } else {
                 viewHolder.button.setBackground(getResources().getDrawable(R.mipmap.cross));
             }
+            if (AppGlobals.getStringFromSP(AppGlobals.KEY_USER_TYPE).equals(AppGlobals.DRIVER)) {
+                viewHolder.phoneNumber.setText(requestDetails.getPhoneNumber());
+            } else {
+                viewHolder.phoneNumber.setVisibility(View.GONE);
+            }
             viewHolder.username.setText(requestDetails.getUserName());
             viewHolder.fromLocation.setText(requestDetails.getFromLocation());
             viewHolder.toLocation.setText(requestDetails.getToLocation());
@@ -283,10 +296,41 @@ public class Home extends Fragment {
                 @Override
                 public void onClick(View view) {
                     if (AppGlobals.getStringFromSP(AppGlobals.KEY_USER_TYPE).equals(AppGlobals.DRIVER)) {
-                        updateState(requestDetails);
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogTheme);
+                        alertDialogBuilder.setTitle("Accept Event");
+                        alertDialogBuilder.setMessage("Do you want to accept event?").setCancelable(false).setPositiveButton("Accept",
+                                new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                                updateState(requestDetails);
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
                     } else {
-                        Log.i("TAG", "click");
-                        deleteRequest(requestDetails);
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogTheme);
+                        alertDialogBuilder.setTitle("Delete Event");
+                        alertDialogBuilder.setMessage("Do you want to Delete this event?").setCancelable(false).setPositiveButton("Accept",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.dismiss();
+                                        deleteRequest(requestDetails);
+                                    }
+                                });
+                        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
                     }
                 }
             });
@@ -306,7 +350,7 @@ public class Home extends Fragment {
         TextView toLocation;
         TextView time;
         AppCompatButton button;
-
+        private TextView phoneNumber;
     }
 
     private void updateState(final RequestDetails requestInfo) {
