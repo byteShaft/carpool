@@ -16,6 +16,12 @@ import com.byteshaft.carpool.fragments.User;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static MainActivity sInstance;
+
+    public static MainActivity getInstance() {
+        return sInstance;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
             LoginActivity.getInstance().finish();
         }
         setContentView(R.layout.activity_main);
+        sInstance = this;
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         loadFragment(new Home());

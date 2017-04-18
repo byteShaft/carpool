@@ -48,6 +48,9 @@ public class IntroScreen extends AppCompatActivity {
         if (AppGlobals.isLogin()) {
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
+        if (MainActivity.getInstance() != null) {
+            MainActivity.getInstance().finish();
+        }
 //        else if (!AppGlobals.isLogin()) {
 //            startActivity(new Intent(getApplicationContext(), CreateAccountActivity.class));
 //        }
