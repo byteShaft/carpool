@@ -277,7 +277,7 @@ public class Home extends Fragment {
             if (decodedByte != null) {
                 viewHolder.circleImageView.setImageBitmap(decodedByte);
             }
-        }
+            }
             if (AppGlobals.getStringFromSP(AppGlobals.KEY_USER_TYPE).equals(AppGlobals.DRIVER)) {
                 viewHolder.button.setBackground(getResources().getDrawable(R.mipmap.tick));
             } else {
@@ -316,14 +316,14 @@ public class Home extends Fragment {
                     } else {
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogTheme);
                         alertDialogBuilder.setTitle("Delete Event");
-                        alertDialogBuilder.setMessage("Do you want to Delete this event?").setCancelable(false).setPositiveButton("Accept",
+                        alertDialogBuilder.setMessage("Do you want to Delete this event?").setCancelable(false).setPositiveButton("yes",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.dismiss();
                                         deleteRequest(requestDetails);
                                     }
                                 });
-                        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        alertDialogBuilder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.dismiss();
@@ -358,6 +358,7 @@ public class Home extends Fragment {
         ref = FirebaseDatabase.getInstance().
                 getReferenceFromUrl("https://carpool-ec8c1.firebaseio.com/");
         final RequestDetails requestDetails = new RequestDetails();
+        requestDetails.setPhoneNumber(requestInfo.getPhoneNumber());
         requestDetails.setServerId(requestInfo.getServerId());
         requestDetails.setSenderId(requestInfo.getSenderId());
         requestDetails.setUserName(requestInfo.getUserName());

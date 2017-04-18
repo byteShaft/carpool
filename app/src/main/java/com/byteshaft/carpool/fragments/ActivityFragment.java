@@ -119,6 +119,7 @@ public class ActivityFragment extends Fragment {
                 viewHolder.toLocation = (TextView) convertView.findViewById(R.id.to_location);
                 viewHolder.time = (TextView) convertView.findViewById(R.id.time);
                 viewHolder.button = (AppCompatButton) convertView.findViewById(R.id.process);
+                viewHolder.phoneNumber = (TextView) convertView.findViewById(R.id.phone_number);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -140,6 +141,11 @@ public class ActivityFragment extends Fragment {
             } else {
                 viewHolder.button.setVisibility(View.GONE);
             }
+            if (AppGlobals.getStringFromSP(AppGlobals.KEY_USER_TYPE).equals(AppGlobals.DRIVER)) {
+                viewHolder.phoneNumber.setText(requestDetails.getPhoneNumber());
+            } else {
+                viewHolder.phoneNumber.setVisibility(View.GONE);
+            }
             viewHolder.username.setText(requestDetails.getUserName());
             viewHolder.fromLocation.setText(requestDetails.getFromLocation());
             viewHolder.toLocation.setText(requestDetails.getToLocation());
@@ -150,14 +156,15 @@ public class ActivityFragment extends Fragment {
                     if (AppGlobals.getStringFromSP(AppGlobals.KEY_USER_TYPE).equals(AppGlobals.DRIVER)) {
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogTheme);
                         alertDialogBuilder.setTitle("Complete Event");
-                        alertDialogBuilder.setMessage("Do you want to mark event as complete?").setCancelable(false).setPositiveButton("Accept",
+                        alertDialogBuilder.setMessage("Do you want to mark event as complete?")
+                                .setCancelable(false).setPositiveButton("Complete",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.dismiss();
                                         completeEvent(requestDetails);
                                     }
                                 });
-                        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        alertDialogBuilder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.dismiss();
@@ -187,6 +194,7 @@ public class ActivityFragment extends Fragment {
         TextView toLocation;
         TextView time;
         AppCompatButton button;
+        TextView phoneNumber;
 
     }
 
@@ -196,6 +204,7 @@ public class ActivityFragment extends Fragment {
                 getReferenceFromUrl("https://carpool-ec8c1.firebaseio.com/");
         final RequestDetails requestDetails = new RequestDetails();
         requestDetails.setEncodedImage(requestInfo.getEncodedImage());
+        requestDetails.setPhoneNumber(requestInfo.getPhoneNumber());
         requestDetails.setServerId(requestInfo.getServerId());
         requestDetails.setSenderId(requestInfo.getSenderId());
         requestDetails.setUserName(requestInfo.getUserName());

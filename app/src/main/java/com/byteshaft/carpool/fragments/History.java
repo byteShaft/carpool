@@ -114,6 +114,7 @@ public class History extends Fragment {
                 viewHolder.toLocation = (TextView) convertView.findViewById(R.id.to_location);
                 viewHolder.time = (TextView) convertView.findViewById(R.id.time);
                 viewHolder.button = (AppCompatButton) convertView.findViewById(R.id.process);
+                viewHolder.phoneNumber = (TextView) convertView.findViewById(R.id.phone_number);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -126,6 +127,7 @@ public class History extends Fragment {
                     viewHolder.circleImageView.setImageBitmap(decodedByte);
                 }
             }
+            viewHolder.phoneNumber.setVisibility(View.GONE);
             viewHolder.button.setVisibility(View.GONE);
             viewHolder.username.setText(requestDetails.getUserName());
             viewHolder.fromLocation.setText(requestDetails.getFromLocation());
@@ -158,6 +160,7 @@ public class History extends Fragment {
         TextView toLocation;
         TextView time;
         AppCompatButton button;
+        TextView phoneNumber;
 
     }
 }
